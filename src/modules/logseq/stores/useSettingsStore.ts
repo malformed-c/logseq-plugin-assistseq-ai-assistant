@@ -24,6 +24,7 @@ const useSettingsStore = create<SettingState>()(
           maxRecursionDepth: 5,
           includeDatePage: false,
           includePageReferences: true,
+          customSystemPrompt: '',
           includeVisualization: true,
           embeddingProvider: AIProvider.Gemini,
           ollamaEndpoint: 'http://localhost:11434/',
