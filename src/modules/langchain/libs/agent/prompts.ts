@@ -1,12 +1,12 @@
 import { AgentState } from "./types"
 
-export function buildAgentSystemPrompt(state: AgentState, availableTools: any[]): string {
+export function buildAgentSystemPrompt(state: AgentState, availableTools: any[], customPrompt?: string): string {
   // Build dynamic tool list based on ACTUAL available tools
   const toolDescriptions = availableTools.map(tool => {
     return `- ${tool.name}: ${tool.description}`
   }).join('\n')
 
-  return `You are an intelligent LogSeq AI assistant with multi-step reasoning and visualization capabilities.
+  const defaultPrompt = `You are an intelligent LogSeq AI assistant with multi-step reasoning and visualization capabilities.
 
 CURRENT CONTEXT:
 Graph: ${state.currentGraphName}
@@ -40,5 +40,12 @@ RESPONSE GUIDELINES:
 - When appropriate, create visualizations to help explain complex concepts or relationships
 
 Think step-by-step.`
+
+  // If custom prompt is provided and not empty, prepend it
+  if (customPrompt && customPrompt.trim() !== '') {
+    return `${customPrompt}\n\n${defaultPrompt}`
+  }
+
+  return defaultPrompt
 }
 

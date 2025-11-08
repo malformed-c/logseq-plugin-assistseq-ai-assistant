@@ -44,7 +44,8 @@ export async function* executeReActAgent(config: AgentConfig) {
     currentPage,
     settings,
     toolsByName,
-    signal
+    signal,
+    customSystemPrompt
   } = config
 
   // Get list of actual available tools
@@ -63,8 +64,8 @@ export async function* executeReActAgent(config: AgentConfig) {
     maxIterations: 3
   }
 
-  // Add system message with ACTUAL available tools
-  const systemMessage = new SystemMessage(buildAgentSystemPrompt(state, availableTools))
+  // Add system message with ACTUAL available tools and custom prompt if provided
+  const systemMessage = new SystemMessage(buildAgentSystemPrompt(state, availableTools, customSystemPrompt))
 
   while (state.iterations < state.maxIterations) {
     // Check abort signal

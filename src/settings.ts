@@ -306,6 +306,14 @@ const settings: SettingSchemaDesc[] = [
     default: true,
   },
   {
+    key: 'customSystemPrompt',
+    type: 'string',
+    title: 'Custom System Prompt',
+    description: 'Customize the AI assistant\'s behavior by providing your own system prompt. Leave empty to use the default prompt. Your custom prompt will be prepended to the default instructions.',
+    default: '',
+    inputAs: 'textarea',
+  },
+  {
     key: 'maxRecursionDepth',
     type: 'number',
     title: 'Document Relational Depth',

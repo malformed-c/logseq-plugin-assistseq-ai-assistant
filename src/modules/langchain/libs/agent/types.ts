@@ -19,5 +19,6 @@ export interface AgentConfig {
   settings: any
   toolsByName: Record<string, any>
   signal?: AbortSignal
+  customSystemPrompt?: string
 }
 

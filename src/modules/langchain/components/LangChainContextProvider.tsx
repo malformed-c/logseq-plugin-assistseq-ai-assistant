@@ -21,10 +21,8 @@ import { advancedQueryTool } from "../tools/logseq-advanced-query"
 
 // const inMemoryStore = new InMemoryStore();
 
-const prompt = ChatPromptTemplate.fromMessages([
-  [
-    "system",
-    `You are an intelligent AI assistant for LogSeq with advanced querying capabilities.
+const buildPromptTemplate = (customSystemPrompt: string) => {
+  const defaultPrompt = `You are an intelligent AI assistant for LogSeq with advanced querying capabilities.
 
 **Primary Tool:**
 - **generate_logseq_advanced_query**: Execute Datalog queries for structured searches
@@ -46,10 +44,18 @@ const prompt = ChatPromptTemplate.fromMessages([
 {kroki_visualization_prompt}
 
 **Current Context:**
-{documents}`],
-  new MessagesPlaceholder("history"),
-  ["human", "{query}"],
-])
+{documents}`
+
+  const systemPrompt = customSystemPrompt && customSystemPrompt.trim() !== ''
+    ? `${customSystemPrompt}\n\n${defaultPrompt}`
+    : defaultPrompt
+
+  return ChatPromptTemplate.fromMessages([
+    ["system", systemPrompt],
+    new MessagesPlaceholder("history"),
+    ["human", "{query}"],
+  ])
+}
 
 type LangChainContext = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +84,10 @@ type Props = {
 const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const { settings } = useSettingsStore()
   const { data: currentPage } = useGetCurrentPage()
+
+  const prompt = useMemo(() => {
+    return buildPromptTemplate(settings.customSystemPrompt)
+  }, [settings.customSystemPrompt])
 
 
   const logSeqRelatedDocumentRetreiver = useMemo(() => {

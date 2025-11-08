@@ -22,6 +22,7 @@ export type LogSeqSettings = {
   maxRecursionDepth: number
   includeDatePage: boolean
   includePageReferences: boolean
+  customSystemPrompt: string
   includeVisualization: boolean
   embeddingProvider: AIProvider
   ollamaEndpoint: string

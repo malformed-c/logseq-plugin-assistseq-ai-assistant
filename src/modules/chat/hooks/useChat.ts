@@ -140,7 +140,8 @@ const useChat = () => {
             currentPage: currentPage || null,
             settings,
             toolsByName,
-            signal: abortControllerRef.current?.signal
+            signal: abortControllerRef.current?.signal,
+            customSystemPrompt: settings.customSystemPrompt
           })
           
           const messageId = uuidv4()
