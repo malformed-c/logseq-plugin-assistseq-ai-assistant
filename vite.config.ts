@@ -10,4 +10,13 @@ export default defineConfig({
     target: "esnext",
     minify: "esbuild",
   },
+  resolve: {
+    alias: {
+      // Polyfill Node.js modules for browser
+      'node:async_hooks': 'node:async_hooks',
+    }
+  },
+  optimizeDeps: {
+    exclude: ['@langchain/langgraph'],
+  },
 });
