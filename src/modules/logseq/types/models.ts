@@ -1,7 +1,25 @@
 export enum GeminiAIModelEnum {
-  Gemini1_5Pro = 'gemini-1.5-pro',
-  Gemini1_5Flash = 'gemini-1.5-flash',
-  Gemini1_0Pro = 'gemini-1.0-pro',  
+  // Gemini 2.5 (Latest)
+  Gemini25Pro = 'gemini-2.5-pro',
+  Gemini25Flash = 'gemini-2.5-flash',
+  Gemini25FlashPreview = 'gemini-2.5-flash-preview-09-2025',
+  
+  // Gemini 2.0
+  Gemini20Flash = 'gemini-2.0-flash',
+  Gemini20FlashExp = 'gemini-2.0-flash-exp',
+  Gemini20FlashLite = 'gemini-2.0-flash-lite',
+  
+  // Gemini 1.5
+  Gemini15Pro = 'gemini-1.5-pro',
+  Gemini15Pro002 = 'gemini-1.5-pro-002',
+  Gemini15Flash = 'gemini-1.5-flash',
+  Gemini15Flash002 = 'gemini-1.5-flash-002',
+  Gemini15Flash8B = 'gemini-1.5-flash-8b',
+  
+  // Legacy
+  GeminiPro = 'gemini-pro',
+  
+  // Embedding
   TextEmbedding004 = 'text-embedding-004'
 }
 
@@ -11,25 +29,25 @@ export enum OpenAIModelEnum {
   GPT4Turbo = 'gpt-4-turbo',
   GPT4 = 'gpt-4',
   GPT3_5Turbo = 'gpt-3.5-turbo',
-  TextEmbeddingAda002 = 'text-embedding-ada-002',
+  O1Preview = 'o1-preview',
+  O1Mini = 'o1-mini',
 }
 
 export enum ChatGroqModelEnum {
-  distilWhisperLargeV3En = 'distil-whisper-large-v3-en',
-  gemma29bit = 'gemma2-9b-it',
-  gemma7bit = 'gemma-7b-it',
-  llama3groq70b8192ToolUsePreview = 'llama3-groq-70b-8192-tool-use-preview',
-  llama3groq8b8192ToolUsePreview = 'llama3-groq-8b-8192-tool-use-preview',
-  llama3170bversatile = 'llama-3.1-70b-versatile',
-  llama318binstant = 'llama-3.1-8b-instant',
-  llamaGuard38b = 'llama-guard-3-8b',
-  llama370b8192 = 'llama3-70b-8192',
-  llama38b8192 = 'llama3-8b-8192',
-  whisperlargev3 = 'whisper-large-v3',
+  llama_3_3_70b_versatile = 'llama-3.3-70b-versatile',
+  llama_3_1_70b_versatile = 'llama-3.1-70b-versatile',
+  llama_3_1_8b_instant = 'llama-3.1-8b-instant',
+  llama3_70b_8192 = 'llama3-70b-8192',
+  llama3_8b_8192 = 'llama3-8b-8192',
+  gemma2_9b_it = 'gemma2-9b-it',
+  mixtral_8x7b_32768 = 'mixtral-8x7b-32768',
 }
 
 export enum OllamaModelEnum {
+  llama3_3 = 'llama3.3',
+  llama3_2 = 'llama3.2',
   llama3_1 = 'llama3.1',
+  llama3 = 'llama3',
   gemma2 = 'gemma2',
   mistral_nemo = 'mistral-nemo',
   qwen2 = 'qwen2',
@@ -38,7 +56,6 @@ export enum OllamaModelEnum {
   mistral = 'mistral',
   mixtral = 'mixtral',
   codegemma = 'codegemma',
-  llama3 = 'llama3',
   command_r = 'command-r',
   command_r_plus = 'command-r-plus',
   llava = 'llava',
@@ -50,4 +67,34 @@ export enum OllamaEmbeddingModelEnum {
   mxbai_embed_large = 'mxbai-embed-large',
   nomic_embed_text = 'nomic-embed-text',
   all_minilm = 'all-minilm',
+}
+
+export enum OpenRouterModelEnum {
+  AnthropicClaudeSonnet = 'anthropic/claude-3.5-sonnet',
+  AnthropicClaudeOpus = 'anthropic/claude-3-opus',
+  OpenAIGPT4o = 'openai/gpt-4o',
+  OpenAIGPT4oMini = 'openai/gpt-4o-mini',
+  OpenAIO1 = 'openai/o1',
+  OpenAIO1Preview = 'openai/o1-preview',
+  OpenAIO1Mini = 'openai/o1-mini',
+  GoogleGemini2Flash = 'google/gemini-2.0-flash-exp',
+  GoogleGeminiPro = 'google/gemini-pro-1.5',
+  MetaLlama3_370B = 'meta-llama/llama-3.3-70b-instruct',
+  MetaLlama3_1405B = 'meta-llama/llama-3.1-405b-instruct',
+  MistralLarge = 'mistralai/mistral-large',
+  DeepSeekChat = 'deepseek/deepseek-chat',
+}
+
+export enum ClaudeModelEnum {
+  Claude35Sonnet20241022 = 'claude-3-5-sonnet-20241022',
+  Claude35Haiku20241022 = 'claude-3-5-haiku-20241022',
+  Claude3Opus20240229 = 'claude-3-opus-20240229',
+  Claude3Haiku20240307 = 'claude-3-haiku-20240307',
+}
+
+export enum MistralModelEnum {
+  MistralLarge = 'mistral-large-latest',
+  MistralSmall = 'mistral-small-latest',
+  Codestral = 'codestral-latest',
+  Mixtral8x7B = 'open-mixtral-8x7b',
 }

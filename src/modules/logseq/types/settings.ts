@@ -1,10 +1,13 @@
-import { ChatGroqModelEnum, GeminiAIModelEnum, OpenAIModelEnum } from "./models"
+import { ChatGroqModelEnum, ClaudeModelEnum, GeminiAIModelEnum, MistralModelEnum, OpenAIModelEnum, OpenRouterModelEnum } from "./models"
 
 export enum AIProvider {
   OpenAI = 'OpenAI',
   Gemini = 'Gemini',
   Ollama = 'Ollama',
   Groq = 'Groq',
+  OpenRouter = 'OpenRouter',
+  Claude = 'Claude',
+  Mistral = 'Mistral',
 }
 
 export type LogSeqSettings = {
@@ -18,6 +21,7 @@ export type LogSeqSettings = {
   blacklistedKeywords: string
   maxRecursionDepth: number
   includeDatePage: boolean
+  includePageReferences: boolean
   includeVisualization: boolean
   embeddingProvider: AIProvider
   ollamaEndpoint: string
@@ -29,4 +33,10 @@ export type LogSeqSettings = {
   chatGroqModel: ChatGroqModelEnum
   maxEmbeddedDocuments: number
   includeURLScrapper: boolean
+  openRouterAPIKey: string
+  openRouterModel: OpenRouterModelEnum
+  claudeAPIKey: string
+  claudeModel: ClaudeModelEnum
+  mistralAPIKey: string
+  mistralModel: MistralModelEnum
 }

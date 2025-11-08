@@ -6,20 +6,16 @@ import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts
 import { Ollama } from "@langchain/ollama"
 import { ChatOpenAI, OpenAI } from "@langchain/openai"
 import { ChatGroq } from "@langchain/groq"
+import { ChatAnthropic } from "@langchain/anthropic"
+import { ChatMistralAI } from "@langchain/mistralai"
 import { StringOutputParser } from "@langchain/core/output_parsers"
-// import { TaskType } from "@google/generative-ai"
-// import { MemoryVectorStore } from "langchain/vectorstores/memory"
 import { DocumentInterface } from "@langchain/core/documents"
-// import { CacheBackedEmbeddings } from "langchain/embeddings/cache_backed"
 import { AIProvider } from "../../logseq/types/settings"
 import { tavilyTool, tavilyToolGroq } from "../tools/tavily"
 import { cheerioTool, cheerioToolGroq } from "../tools/cheerio"
 import useGetCurrentPage from "../../logseq/services/get-current-page"
 import { LogSeqRelevantDocumentRetreiver } from "../libs/document-retrievers/LogSeqRelatedDocumentRetreiver"
-// import { LocalStorageStore } from "../libs/storage/LocaStorageStore"
-import { logSeqDocumentSearchTool, logSeqDocumentSearchToolGroq } from "../tools/logseq-documents-search"
-// import { VectorStore } from "@langchain/core/vectorstores"
-// import { InMemoryStore } from "@langchain/core/stores"
+import { advancedQueryTool } from "../tools/logseq-advanced-query"
 
 // const GOOGLE_EMBEDDING_MODEL = "text-embedding-004"
 
@@ -28,20 +24,28 @@ import { logSeqDocumentSearchTool, logSeqDocumentSearchToolGroq } from "../tools
 const prompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    `You are an AI assistant of a LogSeq plugin that will be used by LogSeq users.
-Please answer user's query (please format your answer using markdown syntax) based on relevant documents below. When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.
-Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.
+    `You are an intelligent AI assistant for LogSeq with advanced querying capabilities.
 
-Please replace any page reference double square brackets (e.g [[Some Document]]) in your answer with this specified markdown link instead, this link will use deeplink url so when user clicked the link, it will be directed to specific page instead, for example:
-[[[Some Document]]](logseq://graph/{current_graph_name}?page=<document title or UUID>)
+**Primary Tool:**
+- **generate_logseq_advanced_query**: Execute Datalog queries for structured searches
+  - Use for: TODO items, tags, properties, dates, specific filters
+  - Generate precise Datalog queries based on user intent
 
-Don't forget to encode the url:
-[[[Some Document With Space]]](logseq://graph/{current_graph_name}?page=Some%20Document%20With%20Space)
+**Additional Tools:**
+- **global_search**: Web search (if enabled)
+- **scrape_url**: URL content extraction (if enabled)
 
-----------------------
+**Important:** When you use tools, the results will be shown to the user automatically. Just provide your final analysis/summary after the tool results.
+
+**Response Guidelines:**
+- Be concise and actionable
+- Use markdown formatting
+- Convert [[Page]] to: [[[Page]]](logseq://graph/{current_graph_name}?page=Page%20Name)
+- Don't mention you used tools - results are already visible to user
+
 {kroki_visualization_prompt}
-----------------------
-CURRENT CONTEXT DOCUMENTS:
+
+**Current Context:**
 {documents}`],
   new MessagesPlaceholder("history"),
   ["human", "{query}"],
@@ -52,12 +56,18 @@ type LangChainContext = {
   chain?: Runnable<any, string>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chainWithTools?: Runnable<any, unknown, RunnableConfig>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tools?: any[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  selectedModel?: any
   retrieveRelatedDocuments?: (query: string) => Promise<DocumentInterface<Record<string, any>>[] | null>
 }
 
 export const LangChainProviderContext = React.createContext<LangChainContext>({
   chain: undefined,
   chainWithTools: undefined,
+  tools: undefined,
+  selectedModel: undefined,
   retrieveRelatedDocuments: undefined
 })
 
@@ -71,14 +81,12 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
 
 
   const logSeqRelatedDocumentRetreiver = useMemo(() => {
-    if (currentPage) {
-      return new LogSeqRelevantDocumentRetreiver({
-        metadata: {
-          pageName: currentPage.name,
-          settings,
-        }
-      })
-    }
+    return new LogSeqRelevantDocumentRetreiver({
+      metadata: {
+        pageName: currentPage?.name || null,  // Can be null now
+        settings,
+      }
+    })
   }, [currentPage, settings])
 
   // const embeddings = useMemo(() => {
@@ -145,9 +153,11 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const openAIModel = useMemo(() => {
     if (settings.openAiApiKey && settings.openAiModel) {
       return new ChatOpenAI({
-        azureOpenAIBasePath: settings.openAIBasePath || undefined,
         apiKey: settings.openAiApiKey,
         model: settings.openAiModel,
+        configuration: {
+          baseURL: settings.openAIBasePath || undefined,
+        },
       })
     }
     return undefined
@@ -168,7 +178,40 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
       return new ChatGroq({
         model: settings.chatGroqModel,
         apiKey: settings.chatGroqAPIKey,
+      })
+    }
+    return undefined
+  }, [settings])
+
+  const openRouterModel = useMemo(() => {
+    if (settings.openRouterAPIKey && settings.openRouterModel) {
+      return new ChatOpenAI({
+        modelName: settings.openRouterModel,
+        apiKey: settings.openRouterAPIKey,
+        configuration: {
+          baseURL: 'https://openrouter.ai/api/v1',
+        },
+      })
+    }
+    return undefined
+  }, [settings])
+
+  const claudeModel = useMemo(() => {
+    if (settings.claudeAPIKey && settings.claudeModel) {
+      return new ChatAnthropic({
+        model: settings.claudeModel,
+        apiKey: settings.claudeAPIKey,
         maxRetries: 2,
+      })
+    }
+    return undefined
+  }, [settings])
+
+  const mistralModel = useMemo(() => {
+    if (settings.mistralAPIKey && settings.mistralModel) {
+      return new ChatMistralAI({
+        model: settings.mistralModel,
+        apiKey: settings.mistralAPIKey,
       })
     }
     return undefined
@@ -184,35 +227,78 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
         return ollamaModel
       case AIProvider.Groq:
         return chatGroqModel
+      case AIProvider.OpenRouter:
+        return openRouterModel
+      case AIProvider.Claude:
+        return claudeModel
+      case AIProvider.Mistral:
+        return mistralModel
     }
-  }, [chatGroqModel, geminiModel, ollamaModel, openAIModel, settings.provider])
+  }, [chatGroqModel, claudeModel, geminiModel, mistralModel, ollamaModel, openAIModel, openRouterModel, settings.provider])
+
+  // Tools array for agent
+  const tools = useMemo(() => {
+    const toolsList: any[] = [advancedQueryTool]
+    
+    console.log('🔧 Building tools list:', {
+      includeTavilySearch: settings.includeTavilySearch,
+      hasTavilyAPIKey: !!settings.tavilyAPIKey,
+      includeURLScrapper: settings.includeURLScrapper,
+      provider: settings.provider
+    })
+    
+    if (settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') {
+      console.log('✅ Adding Tavily search tool')
+      if (settings.provider === AIProvider.Groq) {
+        toolsList.push(tavilyToolGroq as any)
+      } else {
+        toolsList.push(tavilyTool as any)
+      }
+    } else if (settings.includeTavilySearch) {
+      console.warn('⚠️ Tavily search enabled but API key not provided or empty - SKIPPING tool')
+    }
+    
+    if (settings.includeURLScrapper) {
+      console.log('✅ Adding URL scraper tool')
+      if (settings.provider === AIProvider.Groq) {
+        toolsList.push(cheerioToolGroq as any)
+      } else {
+        toolsList.push(cheerioTool as any)
+      }
+    }
+    
+    console.log(`🔧 Total tools available: ${toolsList.length}`)
+    
+    return toolsList
+  }, [settings.includeTavilySearch, settings.includeURLScrapper, settings.tavilyAPIKey, settings.provider])
+
 
   const chainWithTools = useMemo(() => {
     let model = undefined
 
     if (selectedModel) {
       
-      if ([AIProvider.Gemini, AIProvider.OpenAI].includes(settings.provider)) {
+      if ([AIProvider.Gemini, AIProvider.OpenAI, AIProvider.OpenRouter, AIProvider.Claude, AIProvider.Mistral].includes(settings.provider)) {
         //@ts-ignore
         model = selectedModel.bindTools([
-          ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyTool] : [],
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyTool] : [],
           ...(settings.includeURLScrapper) ? [cheerioTool] : [],
-          logSeqDocumentSearchTool,
+          advancedQueryTool,
         ])
       } else if (settings.provider === AIProvider.Groq) {
         //@ts-ignore
         model = selectedModel.bindTools([
-          ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyToolGroq] : [],
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyToolGroq] : [],
           ...(settings.includeURLScrapper) ? [cheerioToolGroq] : [],
-          logSeqDocumentSearchToolGroq,
+          advancedQueryTool,
         ])
       } else {
         //@ts-ignore
         model = selectedModel.bind({
           tools: [
-            ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyTool] : [],
+            ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyTool] : [],
             ...(settings.includeURLScrapper) ? [cheerioTool] : [],
-            logSeqDocumentSearchTool,
+            advancedQueryTool,
           ]
         }) 
       }
@@ -246,6 +332,8 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     <LangChainProviderContext.Provider value={{
       chain,
       chainWithTools,
+      tools,
+      selectedModel,
       retrieveRelatedDocuments,
     }}>
       {children}

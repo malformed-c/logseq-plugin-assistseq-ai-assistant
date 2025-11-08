@@ -1,19 +1,22 @@
 import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
 import { AIProvider } from './modules/logseq/types/settings'
-import { ChatGroqModelEnum, GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from './modules/logseq/types/models'
+import { ChatGroqModelEnum, ClaudeModelEnum, GeminiAIModelEnum, MistralModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum, OpenRouterModelEnum } from './modules/logseq/types/models'
 
 const settings: SettingSchemaDesc[] = [
   {
     key: 'provider',
     type: 'enum',
     title: 'LLM Provider',
-    description: 'Choose your preferred provider. (Currently, this plugin only support Gemini).',
+    description: 'Choose your preferred provider.',
     default: AIProvider.Gemini,
     enumChoices: [
       AIProvider.Gemini,
       AIProvider.OpenAI,
       AIProvider.Ollama,
       AIProvider.Groq,
+      AIProvider.OpenRouter,
+      AIProvider.Claude,
+      AIProvider.Mistral,
     ]
   },
   {
@@ -45,12 +48,15 @@ const settings: SettingSchemaDesc[] = [
     key: 'geminiModel',
     type: 'enum',
     title: 'Gemini Model',
-    description: 'Select Gemini Model.',
-    default: GeminiAIModelEnum.Gemini1_5Flash,
+    description: 'Select Gemini Model. Note: Gemini 2.5 and 2.0 models are recommended. Older models may have limited availability.',
+    default: GeminiAIModelEnum.Gemini25Flash,
     enumChoices: [
-      GeminiAIModelEnum.Gemini1_5Flash,
-      GeminiAIModelEnum.Gemini1_5Pro,
-      GeminiAIModelEnum.Gemini1_0Pro,
+      GeminiAIModelEnum.Gemini25Pro,
+      GeminiAIModelEnum.Gemini25Flash,
+      GeminiAIModelEnum.Gemini25FlashPreview,
+      GeminiAIModelEnum.Gemini20Flash,
+      GeminiAIModelEnum.Gemini20FlashExp,
+      GeminiAIModelEnum.Gemini20FlashLite,
     ]
   },
   {
@@ -79,14 +85,15 @@ const settings: SettingSchemaDesc[] = [
     type: 'enum',
     title: 'OpenAI Model',
     description: 'Select OpenAI Model',
-    default: OpenAIModelEnum.GPT3_5Turbo,
+    default: OpenAIModelEnum.GPT4oMini,
     enumChoices: [
       OpenAIModelEnum.GPT4o,
       OpenAIModelEnum.GPT4oMini,
       OpenAIModelEnum.GPT4Turbo,
       OpenAIModelEnum.GPT4,
       OpenAIModelEnum.GPT3_5Turbo,
-      OpenAIModelEnum.TextEmbeddingAda002,
+      OpenAIModelEnum.O1Preview,
+      OpenAIModelEnum.O1Mini,
     ]
   },
   {
@@ -108,9 +115,12 @@ const settings: SettingSchemaDesc[] = [
     type: 'enum',
     title: 'Ollama Model',
     description: 'Select Ollama model',
-    default: OllamaModelEnum.llama3_1,
+    default: OllamaModelEnum.llama3_3,
     enumChoices: [
+      OllamaModelEnum.llama3_3,
+      OllamaModelEnum.llama3_2,
       OllamaModelEnum.llama3_1,
+      OllamaModelEnum.llama3,
       OllamaModelEnum.gemma2,
       OllamaModelEnum.mistral_nemo,
       OllamaModelEnum.qwen2,
@@ -119,7 +129,6 @@ const settings: SettingSchemaDesc[] = [
       OllamaModelEnum.mistral,
       OllamaModelEnum.mixtral,
       OllamaModelEnum.codegemma,
-      OllamaModelEnum.llama3,
       OllamaModelEnum.command_r,
       OllamaModelEnum.command_r_plus,
       OllamaModelEnum.llava,
@@ -158,19 +167,105 @@ const settings: SettingSchemaDesc[] = [
     type: 'enum',
     title: 'Groq Model',
     description: 'Select Groq Model',
-    default: ChatGroqModelEnum.llama3170bversatile,
+    default: ChatGroqModelEnum.llama_3_3_70b_versatile,
     enumChoices: [
-      ChatGroqModelEnum.distilWhisperLargeV3En,
-      ChatGroqModelEnum.gemma29bit,
-      ChatGroqModelEnum.gemma7bit,
-      ChatGroqModelEnum.llama3groq70b8192ToolUsePreview,
-      ChatGroqModelEnum.llama3groq8b8192ToolUsePreview,
-      ChatGroqModelEnum.llama3170bversatile,
-      ChatGroqModelEnum.llama318binstant,
-      ChatGroqModelEnum.llamaGuard38b,
-      ChatGroqModelEnum.llama370b8192,
-      ChatGroqModelEnum.llama38b8192,
-      ChatGroqModelEnum.whisperlargev3,
+      ChatGroqModelEnum.llama_3_3_70b_versatile,
+      ChatGroqModelEnum.llama_3_1_70b_versatile,
+      ChatGroqModelEnum.llama_3_1_8b_instant,
+      ChatGroqModelEnum.llama3_70b_8192,
+      ChatGroqModelEnum.llama3_8b_8192,
+      ChatGroqModelEnum.gemma2_9b_it,
+      ChatGroqModelEnum.mixtral_8x7b_32768,
+    ]
+  },
+  {
+    key: 'openRouterSettings',
+    type: 'heading',
+    title: 'OpenRouter Settings',
+    description: 'Settings for OpenRouter provider.',
+    default: '',
+  },
+  {
+    key: 'openRouterAPIKey',
+    type: 'string',
+    title: 'OpenRouter API Key',
+    description: 'Your OpenRouter API Key (This key will saved locally). https://openrouter.ai/keys',
+    default: '',
+  },
+  {
+    key: 'openRouterModel',
+    type: 'enum',
+    title: 'OpenRouter Model',
+    description: 'Select OpenRouter Model',
+    default: OpenRouterModelEnum.OpenAIGPT4oMini,
+    enumChoices: [
+      OpenRouterModelEnum.AnthropicClaudeSonnet,
+      OpenRouterModelEnum.AnthropicClaudeOpus,
+      OpenRouterModelEnum.OpenAIGPT4o,
+      OpenRouterModelEnum.OpenAIGPT4oMini,
+      OpenRouterModelEnum.OpenAIO1,
+      OpenRouterModelEnum.OpenAIO1Preview,
+      OpenRouterModelEnum.OpenAIO1Mini,
+      OpenRouterModelEnum.GoogleGemini2Flash,
+      OpenRouterModelEnum.GoogleGeminiPro,
+      OpenRouterModelEnum.MetaLlama3_370B,
+      OpenRouterModelEnum.MetaLlama3_1405B,
+      OpenRouterModelEnum.MistralLarge,
+      OpenRouterModelEnum.DeepSeekChat,
+    ]
+  },
+  {
+    key: 'claudeSettings',
+    type: 'heading',
+    title: 'Claude Settings',
+    description: 'Settings for Claude (Anthropic) provider.',
+    default: '',
+  },
+  {
+    key: 'claudeAPIKey',
+    type: 'string',
+    title: 'Claude API Key',
+    description: 'Your Claude API Key (This key will saved locally). https://console.anthropic.com/settings/keys',
+    default: '',
+  },
+  {
+    key: 'claudeModel',
+    type: 'enum',
+    title: 'Claude Model',
+    description: 'Select Claude Model',
+    default: ClaudeModelEnum.Claude35Sonnet20241022,
+    enumChoices: [
+      ClaudeModelEnum.Claude35Sonnet20241022,
+      ClaudeModelEnum.Claude35Haiku20241022,
+      ClaudeModelEnum.Claude3Opus20240229,
+      ClaudeModelEnum.Claude3Haiku20240307,
+    ]
+  },
+  {
+    key: 'mistralSettings',
+    type: 'heading',
+    title: 'Mistral Settings',
+    description: 'Settings for Mistral AI provider.',
+    default: '',
+  },
+  {
+    key: 'mistralAPIKey',
+    type: 'string',
+    title: 'Mistral API Key',
+    description: 'Your Mistral API Key (This key will saved locally). https://console.mistral.ai/api-keys',
+    default: '',
+  },
+  {
+    key: 'mistralModel',
+    type: 'enum',
+    title: 'Mistral Model',
+    description: 'Select Mistral Model',
+    default: MistralModelEnum.MistralLarge,
+    enumChoices: [
+      MistralModelEnum.MistralLarge,
+      MistralModelEnum.MistralSmall,
+      MistralModelEnum.Codestral,
+      MistralModelEnum.Mixtral8x7B,
     ]
   },
   {
@@ -202,6 +297,13 @@ const settings: SettingSchemaDesc[] = [
     title: 'Include Date Page?',
     description: 'Do you want to include date page ([[August 24th, 2024]]) as context to any AI Conversation?',
     default: false,
+  },
+  {
+    key: 'includePageReferences',
+    type: 'boolean',
+    title: 'Include Page References?',
+    description: 'Do you want to include linked and unlinked references to the current page as context?',
+    default: true,
   },
   {
     key: 'maxRecursionDepth',

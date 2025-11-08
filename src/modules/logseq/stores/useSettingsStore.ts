@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { AIProvider, LogSeqSettings } from '../types/settings'
-import { ChatGroqModelEnum, GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from '../types/models'
+import { ChatGroqModelEnum, ClaudeModelEnum, GeminiAIModelEnum, MistralModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum, OpenRouterModelEnum } from '../types/models'
 
 interface SettingState {
   settings: LogSeqSettings
@@ -14,7 +14,7 @@ const useSettingsStore = create<SettingState>()(
       (set) => ({
         settings: {
           geminiApiKey: '',
-          geminiModel: GeminiAIModelEnum.Gemini1_5Flash,
+          geminiModel: GeminiAIModelEnum.Gemini25Flash,
           openAiApiKey: '',
           openAiModel: OpenAIModelEnum.GPT3_5Turbo,
           openAIBasePath: 'https://api.openai.com/v1/',
@@ -23,17 +23,24 @@ const useSettingsStore = create<SettingState>()(
           blacklistedKeywords: 'pass,api key,confidential,password',
           maxRecursionDepth: 5,
           includeDatePage: false,
+          includePageReferences: true,
           includeVisualization: true,
           embeddingProvider: AIProvider.Gemini,
           ollamaEndpoint: 'http://localhost:11434/',
-          ollamaModel: OllamaModelEnum.llama3_1,
+          ollamaModel: OllamaModelEnum.llama3_3,
           ollamaEmbeddingModel: OllamaEmbeddingModelEnum.mxbai_embed_large,
           includeTavilySearch: true,
           tavilyAPIKey: '',
           chatGroqAPIKey: '',
-          chatGroqModel: ChatGroqModelEnum.llama3170bversatile,
+          chatGroqModel: ChatGroqModelEnum.llama_3_3_70b_versatile,
           maxEmbeddedDocuments: 10,
           includeURLScrapper: false,
+          openRouterAPIKey: '',
+          openRouterModel: OpenRouterModelEnum.AnthropicClaudeSonnet,
+          claudeAPIKey: '',
+          claudeModel: ClaudeModelEnum.Claude35Sonnet20241022,
+          mistralAPIKey: '',
+          mistralModel: MistralModelEnum.MistralLarge,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),
