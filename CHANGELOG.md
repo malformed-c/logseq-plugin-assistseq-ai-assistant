@@ -1,3 +1,19 @@
+# [2.6.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.5.0...v2.6.0) (2025-11-08)
+
+
+### Bug Fixes
+
+* improve type safety and null handling ([67469f4](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/67469f470f8360d240800359008026b0e769d0e7))
+
+
+### Features
+
+* add global mode and improve chat session handling ([9a8368a](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/9a8368ac446be1ac06cadfd799a328e89dfd3b11))
+* add stop generation button and improved error handling ([d4a170a](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/d4a170ae7e9be1ab92580492ca9f21870c2a6fe4))
+* add support for Claude, Mistral, and OpenRouter AI providers ([5b0a756](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/5b0a75621c41c8329a64fdef6419e8922eecce26))
+* implement ReAct agent with advanced Datalog query capabilities ([91be478](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/91be4788ddec512b50f2e12fc27db36fcce5cf94))
+* update plugin icon name ([54c8d27](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/54c8d27d19f329ac8444883fee557ed926bd64f6))
+
 # [2.5.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.4.0...v2.5.0) (2024-09-25)
 
 
