@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.7.0...v2.8.0) (2025-11-08)
+
+
+### Features
+
+* added keyboard command [#17](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/17) ([bc9205f](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/bc9205fa50d01e73f3e55bf9e5a0d8b0af792fc6))
+
 # [2.7.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.6.1...v2.7.0) (2025-11-08)
 
 
