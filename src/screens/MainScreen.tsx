@@ -7,7 +7,7 @@ import useCopyToClipboard from "../modules/shared/services/copy-to-clipboard"
 import useSettingsStore from "../modules/logseq/stores/useSettingsStore"
 import useChat from "../modules/chat/hooks/useChat"
 import { AIProvider } from "../modules/logseq/types/settings"
-import { ChatMessageRoleEnum } from "../modules/chat/types/chat"
+import { ChatMessage, ChatMessageRoleEnum } from "../modules/chat/types/chat"
 import ChatBubble from "../modules/chat/components/ChatBubble"
 import MarkdownRenderer from "../modules/shared/components/MarkdownRenderer"
 import TextArea from "../modules/shared/components/TextArea"
@@ -22,7 +22,7 @@ const MainScreen: React.FC<Props> = () => {
   const { showMessage } = useControlUI()
   const { mutate: appendBlockToPage } = useAppendBlockToPage()
   const { copyToClipboard } = useCopyToClipboard()  
-  const { messages, chat, isLoading, clearChat, currentPageName } = useChat()
+  const { messages, chat, isLoading, clearChat, currentPageName, error, isGenerating, stopGenerating } = useChat()
   const [query, setQuery] = useState<string>('')
   const bottomChatRef = useRef<HTMLDivElement | null>(null)
 
@@ -42,6 +42,12 @@ const MainScreen: React.FC<Props> = () => {
       return settings.ollamaModel
     } else if (settings.provider === AIProvider.Groq) {
       return settings.chatGroqModel
+    } else if (settings.provider === AIProvider.OpenRouter) {
+      return settings.openRouterModel
+    } else if (settings.provider === AIProvider.Claude) {
+      return settings.claudeModel
+    } else if (settings.provider === AIProvider.Mistral) {
+      return settings.mistralModel
     }
     return ''
   }, [settings])
@@ -62,6 +68,45 @@ const MainScreen: React.FC<Props> = () => {
     showMessage("Added to your current page!", "success")
   }, [appendBlockToPage, showMessage])
 
+  if (error && (error as Error)?.message !== 'No page found') {
+    const errorMessage = (error as Error)?.message || 'Unknown error'
+    const isModelError = errorMessage.includes('is not found') || errorMessage.includes('not available') || errorMessage.includes('not supported')
+    
+    return (
+      <Card className="h-full relative flex items-center justify-center flex-col">
+        <svg className="w-16 h-16 text-red-500 dark:text-red-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+        </svg>
+        <h2 className="text-2xl text-gray-800 font-bold dark:text-white mt-4">
+          {isModelError ? 'Model Not Available' : 'Unable to Load Page'}
+        </h2>
+        <p className="mb-3 text-gray-500 text-center dark:text-gray-400 mt-2 max-w-md">
+          {isModelError ? (
+            <>
+              The selected AI model is not available. Please update your settings:
+              <br /><br />
+              1. Click the plugin settings (⚙️) icon
+              <br />
+              2. Change your <strong>Gemini Model</strong> to <strong>gemini-2.5-flash</strong> or another available model
+              <br />
+              3. Reload the plugin
+              <br /><br />
+              Note: Gemini 1.5 models have been deprecated. Please use Gemini 2.5 or 2.0 models.
+            </>
+          ) : (
+            <>
+              Could not load the current LogSeq page. Please make sure you&apos;re on a valid page (not on the home screen or settings).
+              Try opening a specific page or journal entry.
+            </>
+          )}
+        </p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          Error: {errorMessage}
+        </p>
+      </Card>
+    )
+  }
+
   if (isLoading) {
     return (
       <Card className="h-full relative flex items-center justify-center">
@@ -76,7 +121,7 @@ const MainScreen: React.FC<Props> = () => {
         <div className="h-full overflow-y-scroll" >
           {messages.length > 0 ? (
             <div className="pb-36 px-4 pt-24 flex flex-col justify-end">
-              {messages.map((message) => message.role === ChatMessageRoleEnum.User ? 
+              {messages.map((message: ChatMessage) => message.role === ChatMessageRoleEnum.User ? 
                 <div key={message.id} className="w-full flex justify-end">
                   <ChatBubble className="w-3/5 mb-8">
                     <p className="text-gray-800 dark:text-gray-400">{message.content}</p>
@@ -137,7 +182,7 @@ const MainScreen: React.FC<Props> = () => {
               value={query}
             />
             <div className="flex flex-row items-centers justify-between mt-1">
-              <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022; {currentPageName}</span>
+              <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022; {currentPageName || '🌍 Global Mode'}</span>
 
               <span
                 className="text-xs text-gray-500 underline cursor-pointer"
@@ -151,12 +196,21 @@ const MainScreen: React.FC<Props> = () => {
               </span>
             </div>
             <div className="absolute bottom-5 top-0 right-0 flex items-end pb-2">
-              <button disabled={isLoading || !query} onClick={onChatSendButtonClicked} type="button" className={`text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800 opacity-${isLoading || !query ? '50' : '100'}`}>
-                <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                </svg>
-                <span className="sr-only">Send Message</span>
-              </button>
+              {isGenerating ? (
+                <button onClick={stopGenerating} type="button" className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+                  <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 12 16">
+                    <path d="M3 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm7 0H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Z"/>
+                  </svg>
+                  <span className="sr-only">Stop Generating</span>
+                </button>
+              ) : (
+                <button disabled={isLoading || !query} onClick={onChatSendButtonClicked} type="button" className={`text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800 opacity-${isLoading || !query ? '50' : '100'}`}>
+                  <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                  </svg>
+                  <span className="sr-only">Send Message</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
