@@ -1,3 +1,15 @@
+# [2.7.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.6.1...v2.7.0) (2025-11-08)
+
+
+### Bug Fixes
+
+* missing default value ([a025d07](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/a025d073303804a750acece3da471329946d824e))
+
+
+### Features
+
+* added custom system prompt [#16](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/16) ([a807980](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/a807980cc397d2f38756d28803592792035354f6))
+
 ## [2.6.1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.6.0...v2.6.1) (2025-11-08)
 
 
