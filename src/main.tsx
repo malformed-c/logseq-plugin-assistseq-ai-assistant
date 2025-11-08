@@ -68,6 +68,15 @@ function main() {
       </a>
     `,
   })
+
+  // Register keyboard shortcut
+  const keyboardShortcut = logseq.settings?.keyboardShortcut || 'mod+shift+a'
+  logseq.App.registerCommandShortcut(
+    { binding: keyboardShortcut } as any,
+    () => {
+      logseq.showMainUI()
+    }
+  )
 }
 
 logseq.useSettingsSchema(settings).ready(main).catch(console.error)

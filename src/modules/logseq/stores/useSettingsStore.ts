@@ -25,6 +25,7 @@ const useSettingsStore = create<SettingState>()(
           includeDatePage: false,
           includePageReferences: true,
           customSystemPrompt: '',
+          keyboardShortcut: 'mod+shift+a',
           includeVisualization: true,
           embeddingProvider: AIProvider.Gemini,
           ollamaEndpoint: 'http://localhost:11434/',

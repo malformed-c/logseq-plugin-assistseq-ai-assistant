@@ -314,6 +314,13 @@ const settings: SettingSchemaDesc[] = [
     inputAs: 'textarea',
   },
   {
+    key: 'keyboardShortcut',
+    type: 'string',
+    title: 'Keyboard Shortcut',
+    description: 'Keyboard shortcut to open AssistSeq. Use format like "mod+shift+a" (mod = Ctrl on Windows/Linux, Cmd on macOS). Requires plugin reload to take effect.',
+    default: 'mod+shift+a',
+  },
+  {
     key: 'maxRecursionDepth',
     type: 'number',
     title: 'Document Relational Depth',

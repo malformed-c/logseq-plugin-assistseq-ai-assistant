@@ -23,6 +23,7 @@ export type LogSeqSettings = {
   includeDatePage: boolean
   includePageReferences: boolean
   customSystemPrompt: string
+  keyboardShortcut: string
   includeVisualization: boolean
   embeddingProvider: AIProvider
   ollamaEndpoint: string

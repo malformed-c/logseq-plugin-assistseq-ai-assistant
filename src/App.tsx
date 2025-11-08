@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { useAppVisible } from "./utils"
 import useControlUI from './modules/logseq/hooks/control-ui'
 import useListenSettings from './modules/logseq/hooks/listen-settings'
@@ -19,6 +19,22 @@ function App() {
       hideMainUI()
     }
   }, [hideMainUI])
+
+  // Add Escape key handler
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && visible) {
+        hideMainUI()
+      }
+    }
+
+    if (visible) {
+      document.addEventListener('keydown', handleEscape)
+      return () => {
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+  }, [visible, hideMainUI])
 
   if (visible) {
     return (
