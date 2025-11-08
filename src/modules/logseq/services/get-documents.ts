@@ -16,8 +16,8 @@ async function appendBlockContent(
   documents: LogSeqDocument[],
   visitedPages: Set<string>
 ): Promise<string> {
-  if (block.refs) {
-    for(const ref of block.refs) {
+  if (block.refs && Array.isArray(block.refs)) {
+    for(const ref of block.refs as any[]) {
       await getDocumentsRecursively(ref.id, documents, visitedPages, depth + 1, settings)
     }
   }
@@ -77,8 +77,8 @@ async function getDocumentsRecursively(
   })
 
   for (const block of blocks) {
-    if (block.refs) {
-      for (const ref of block.refs) {        
+    if (block.refs && Array.isArray(block.refs)) {
+      for (const ref of block.refs as any[]) {        
         await getDocumentsRecursively(ref.id, documents, visitedPages, depth + 1, settings)
       }
     }

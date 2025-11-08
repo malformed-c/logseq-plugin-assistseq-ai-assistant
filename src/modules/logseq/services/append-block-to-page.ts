@@ -6,8 +6,8 @@ const useAppendBlockToPage = () => {
     mutationFn: async ({text}: {text: string}) => {
       const currentPage = await logseq.Editor.getCurrentPage()
 
-      if (currentPage) {
-        await logseq.Editor.appendBlockInPage(currentPage?.name, text)
+      if (currentPage?.name) {
+        await logseq.Editor.appendBlockInPage(currentPage.name as string, text)
       }
     },
     mutationKey: ['append-block-to-page']

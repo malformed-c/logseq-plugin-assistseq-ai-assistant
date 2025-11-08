@@ -8,9 +8,9 @@ const schema = z.object({
 });
 
 async function loadHTML(url: string) {
-  const $ = await cheerio.fromURL(
-    url,
-  );
+  const response = await fetch(url);
+  const html = await response.text();
+  const $ = cheerio.load(html);
   return $;
 }
 

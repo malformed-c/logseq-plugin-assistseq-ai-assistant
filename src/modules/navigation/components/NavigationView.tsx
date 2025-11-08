@@ -19,7 +19,10 @@ const NavigationView: React.FC = () => {
     if (((settings.provider === AIProvider.Gemini && settings.geminiApiKey) || 
         (settings.provider === AIProvider.OpenAI && settings.openAiApiKey) ||
         (settings.provider === AIProvider.Ollama && settings.ollamaEndpoint) ||
-        (settings.provider === AIProvider.Groq && settings.chatGroqAPIKey))) {
+        (settings.provider === AIProvider.Groq && settings.chatGroqAPIKey) ||
+        (settings.provider === AIProvider.OpenRouter && settings.openRouterAPIKey) ||
+        (settings.provider === AIProvider.Claude && settings.claudeAPIKey) ||
+        (settings.provider === AIProvider.Mistral && settings.mistralAPIKey))) {
       setRoute(NavigationRoute.Main)
     } else if(!isAcceptedTermsAndConditions) {
       setRoute(NavigationRoute.TermsAndConditions)

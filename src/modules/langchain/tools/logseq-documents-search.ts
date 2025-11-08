@@ -33,11 +33,11 @@ export const getLogSeqDocumentsSearchTool = async ({ keywords, limit }: {keyword
 
             if (block.children && block.children.length > 0) {
                 for (let j = 0; j < block.children.length; j++) {
-                    const element = block.children[j];
+                    const element = block.children[j] as any;
 
-                    if (element.length > 1) {
-                        const block = await window.logseq.Editor.getBlock(element[1])
-                        content += `- ${block?.content}`
+                    if (Array.isArray(element) && element.length > 1) {
+                        const childBlock = await window.logseq.Editor.getBlock(element[1])
+                        content += `- ${childBlock?.content}`
                     }
                 }
             }
@@ -53,7 +53,7 @@ export const getLogSeqDocumentsSearchTool = async ({ keywords, limit }: {keyword
 }
 
 const NAME = "logseq_documents_search"
-const DESC = "You can use this tool to search additional LogSeq documents to enrich your answer."
+const DESC = "Search LogSeq documents by keywords. Use for semantic search when you need more context beyond current documents. Returns formatted document content."
 
 export const logSeqDocumentSearchTool = {
   schema,
