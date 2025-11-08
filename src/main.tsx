@@ -46,7 +46,7 @@ function main() {
     zIndex: 11,
   })
 
-  const openIconName = "template-plugin-open"
+  const openIconName = "assistseq-ai-assistant-open"
 
   logseq.provideStyle(css`
     .${openIconName} {
