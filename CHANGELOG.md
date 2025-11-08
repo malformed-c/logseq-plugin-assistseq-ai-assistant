@@ -1,3 +1,10 @@
+## [2.6.1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.6.0...v2.6.1) (2025-11-08)
+
+
+### Bug Fixes
+
+* ensure CI compatibility with latest dependencies ([1d1b7ca](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/1d1b7ca2647644a0630b535e01d04f4a1413a91f))
+
 # [2.6.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.5.0...v2.6.0) (2025-11-08)
 
 
