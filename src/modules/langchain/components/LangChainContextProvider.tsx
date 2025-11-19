@@ -46,15 +46,10 @@ const buildPromptTemplate = (customSystemPrompt: string) => {
 **Current Context:**
 {documents}`
 
-  const systemPrompt = customSystemPrompt && customSystemPrompt.trim() !== ''
-    ? `${customSystemPrompt}\n\n${defaultPrompt}`
-    : defaultPrompt
+  const systemPrompt =
+    customSystemPrompt && customSystemPrompt.trim() !== "" ? `${customSystemPrompt}\n\n${defaultPrompt}` : defaultPrompt
 
-  return ChatPromptTemplate.fromMessages([
-    ["system", systemPrompt],
-    new MessagesPlaceholder("history"),
-    ["human", "{query}"],
-  ])
+  return ChatPromptTemplate.fromMessages([["system", systemPrompt], new MessagesPlaceholder("history"), ["human", "{query}"]])
 }
 
 type LangChainContext = {
@@ -74,7 +69,7 @@ export const LangChainProviderContext = React.createContext<LangChainContext>({
   chainWithTools: undefined,
   tools: undefined,
   selectedModel: undefined,
-  retrieveRelatedDocuments: undefined
+  retrieveRelatedDocuments: undefined,
 })
 
 type Props = {
@@ -89,13 +84,12 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     return buildPromptTemplate(settings.customSystemPrompt)
   }, [settings.customSystemPrompt])
 
-
   const logSeqRelatedDocumentRetreiver = useMemo(() => {
     return new LogSeqRelevantDocumentRetreiver({
       metadata: {
-        pageName: currentPage?.name || null,  // Can be null now
+        pageName: currentPage?.name || null, // Can be null now
         settings,
-      }
+      },
     })
   }, [currentPage, settings])
 
@@ -116,45 +110,47 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   //   return null
   // }, [settings.embeddingProvider, settings.geminiApiKey, settings.ollamaEmbeddingModel, settings.ollamaEndpoint])
 
-  const retrieveRelatedDocuments = useCallback(async (query: string) => {
-    if (logSeqRelatedDocumentRetreiver) {
-      const documents = await logSeqRelatedDocumentRetreiver.invoke(query)      
+  const retrieveRelatedDocuments = useCallback(
+    async (query: string) => {
+      if (logSeqRelatedDocumentRetreiver) {
+        const documents = await logSeqRelatedDocumentRetreiver.invoke(query)
 
-      // if (embeddings) {
-      //   const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-      //     embeddings,
-      //     inMemoryStore,
-      //     {
-      //       namespace: embeddings.model,
-      //     }
-      //   );
+        // if (embeddings) {
+        //   const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
+        //     embeddings,
+        //     inMemoryStore,
+        //     {
+        //       namespace: embeddings.model,
+        //     }
+        //   );
 
-      //   const vectorstore = await MemoryVectorStore.fromDocuments(
-      //     documents.map(doc => ({ pageContent: doc.pageContent, metadata: doc.metadata})),
-      //     cacheBackedEmbeddings
-      //   );
-      
-      //   const retriever = vectorstore.asRetriever(settings.maxEmbeddedDocuments);
-  
-      //   const retrievedDocuments = await retriever.invoke(query);
-  
-      //   return retrievedDocuments
-      // }
+        //   const vectorstore = await MemoryVectorStore.fromDocuments(
+        //     documents.map(doc => ({ pageContent: doc.pageContent, metadata: doc.metadata})),
+        //     cacheBackedEmbeddings
+        //   );
 
-      return documents.map((doc) => ({
-         metadata: doc.metadata,
-         pageContent: doc.pageContent,
-      }))
-    }
-    return null;
-  }, [logSeqRelatedDocumentRetreiver])
+        //   const retriever = vectorstore.asRetriever(settings.maxEmbeddedDocuments);
+
+        //   const retrievedDocuments = await retriever.invoke(query);
+
+        //   return retrievedDocuments
+        // }
+
+        return documents.map((doc) => ({
+          metadata: doc.metadata,
+          pageContent: doc.pageContent,
+        }))
+      }
+      return null
+    },
+    [logSeqRelatedDocumentRetreiver]
+  )
 
   const geminiModel = useMemo(() => {
     if (settings.geminiApiKey && settings.geminiModel) {
       return new ChatGoogleGenerativeAI({
         apiKey: settings.geminiApiKey,
         model: settings.geminiModel,
-        
       })
     }
     return undefined
@@ -194,15 +190,24 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [settings])
 
   const openRouterModel = useMemo(() => {
-    if (settings.openRouterAPIKey && settings.openRouterModel) {
+    if (settings.openRouterAPIKey && (settings.openRouterModel as string) === "Custom" && settings.customOpenRouterModel) {
+      return new ChatOpenAI({
+        modelName: settings.customOpenRouterModel,
+        apiKey: settings.openRouterAPIKey,
+        configuration: {
+          baseURL: "https://openrouter.ai/api/v1",
+        },
+      })
+    } else if (settings.openRouterAPIKey && settings.openRouterModel) {
       return new ChatOpenAI({
         modelName: settings.openRouterModel,
         apiKey: settings.openRouterAPIKey,
         configuration: {
-          baseURL: 'https://openrouter.ai/api/v1',
+          baseURL: "https://openrouter.ai/api/v1",
         },
       })
     }
+
     return undefined
   }, [settings])
 
@@ -227,8 +232,8 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     return undefined
   }, [settings])
 
-  const selectedModel = useMemo(() => {  
-    switch(settings.provider) {
+  const selectedModel = useMemo(() => {
+    switch (settings.provider) {
       case AIProvider.Gemini:
         return geminiModel
       case AIProvider.OpenAI:
@@ -249,68 +254,72 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   // Tools array for agent
   const tools = useMemo(() => {
     const toolsList: any[] = [advancedQueryTool]
-    
-    console.log('🔧 Building tools list:', {
+
+    console.log("🔧 Building tools list:", {
       includeTavilySearch: settings.includeTavilySearch,
       hasTavilyAPIKey: !!settings.tavilyAPIKey,
       includeURLScrapper: settings.includeURLScrapper,
-      provider: settings.provider
+      provider: settings.provider,
     })
-    
-    if (settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') {
-      console.log('✅ Adding Tavily search tool')
+
+    if (settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== "") {
+      console.log("✅ Adding Tavily search tool")
       if (settings.provider === AIProvider.Groq) {
         toolsList.push(tavilyToolGroq as any)
       } else {
         toolsList.push(tavilyTool as any)
       }
     } else if (settings.includeTavilySearch) {
-      console.warn('⚠️ Tavily search enabled but API key not provided or empty - SKIPPING tool')
+      console.warn("⚠️ Tavily search enabled but API key not provided or empty - SKIPPING tool")
     }
-    
+
     if (settings.includeURLScrapper) {
-      console.log('✅ Adding URL scraper tool')
+      console.log("✅ Adding URL scraper tool")
       if (settings.provider === AIProvider.Groq) {
         toolsList.push(cheerioToolGroq as any)
       } else {
         toolsList.push(cheerioTool as any)
       }
     }
-    
+
     console.log(`🔧 Total tools available: ${toolsList.length}`)
-    
+
     return toolsList
   }, [settings.includeTavilySearch, settings.includeURLScrapper, settings.tavilyAPIKey, settings.provider])
-
 
   const chainWithTools = useMemo(() => {
     let model = undefined
 
     if (selectedModel) {
-      
-      if ([AIProvider.Gemini, AIProvider.OpenAI, AIProvider.OpenRouter, AIProvider.Claude, AIProvider.Mistral].includes(settings.provider)) {
+      if (
+        [AIProvider.Gemini, AIProvider.OpenAI, AIProvider.OpenRouter, AIProvider.Claude, AIProvider.Mistral].includes(
+          settings.provider
+        )
+      ) {
         //@ts-ignore
         model = selectedModel.bindTools([
-          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyTool] : [],
-          ...(settings.includeURLScrapper) ? [cheerioTool] : [],
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== "" ? [tavilyTool] : []),
+          ...(settings.includeURLScrapper ? [cheerioTool] : []),
           advancedQueryTool,
         ])
       } else if (settings.provider === AIProvider.Groq) {
         //@ts-ignore
         model = selectedModel.bindTools([
-          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyToolGroq] : [],
-          ...(settings.includeURLScrapper) ? [cheerioToolGroq] : [],
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== ""
+            ? [tavilyToolGroq]
+            : []),
+          ...(settings.includeURLScrapper ? [cheerioToolGroq] : []),
           advancedQueryTool,
         ])
       } else {
         //@ts-ignore
         model = selectedModel.bind({
           tools: [
-            ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '') ? [tavilyTool] : [],
-            ...(settings.includeURLScrapper) ? [cheerioTool] : [],
+            ...(settings.includeTavilySearch && settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== "" ? [tavilyTool] : []),
+            ...(settings.includeURLScrapper ? [cheerioTool] : []),
             advancedQueryTool,
-          ]
-        }) 
+          ],
+        })
       }
 
       if (model) {
@@ -325,12 +334,7 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
 
   const chain = useMemo(() => {
     if (selectedModel) {
-
-      const chain = RunnableSequence.from([
-        prompt,        
-        selectedModel,
-        new StringOutputParser(),
-      ])
+      const chain = RunnableSequence.from([prompt, selectedModel, new StringOutputParser()])
 
       return chain
     }
@@ -339,13 +343,14 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [selectedModel])
 
   return (
-    <LangChainProviderContext.Provider value={{
-      chain,
-      chainWithTools,
-      tools,
-      selectedModel,
-      retrieveRelatedDocuments,
-    }}>
+    <LangChainProviderContext.Provider
+      value={{
+        chain,
+        chainWithTools,
+        tools,
+        selectedModel,
+        retrieveRelatedDocuments,
+      }}>
       {children}
     </LangChainProviderContext.Provider>
   )

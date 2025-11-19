@@ -212,7 +212,15 @@ const settings: SettingSchemaDesc[] = [
       OpenRouterModelEnum.MetaLlama3_1405B,
       OpenRouterModelEnum.MistralLarge,
       OpenRouterModelEnum.DeepSeekChat,
+      "Custom",
     ]
+  },
+  {
+    key: 'customOpenRouterModel',
+    type: 'string',
+    title: 'Custom Model ID',
+    description: 'Enter the model ID here (e.g. "mistralai/mixtral-8x7b-instruct") if you selected "Custom" above.',
+    default: "",
   },
   {
     key: 'claudeSettings',
