@@ -5,8 +5,8 @@
 </div>
 
 <div align="center">
-  Elevate your Logseq experience with AssistSeq – an elegant and smart AI assistant that seamlessly integrates with your workflow. 
-  
+  Elevate your Logseq experience with AssistSeq – an elegant and smart AI assistant that seamlessly integrates with your workflow.
+
   AssistSeq analyzes your <b>current document</b> and all <b>related notes</b>, leveraging them as <b>context</b> for insightful conversations with your preferred LLM model.
 </div>
 
@@ -45,13 +45,6 @@ Whenever the AssistSeq's AI see url, it will automatically scrape the website an
 
 ## What is Logseq?
 Logseq is a privacy-first, open-source knowledge base designed for lifelong learners. Discover more at https://logseq.com.
-
-## Support My Work
-<div align="center">
-  <a href="https://buymeacoffee.com/ghackdev" target="_blank">
-    <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/images/buymeacoffee.png" width="200" />
-  </a>
-</div>
 
 ## License
 This project is licensed under the <a href="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/blob/master/LICENSE">MIT License</a>.
